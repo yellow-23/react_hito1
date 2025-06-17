@@ -380,6 +380,26 @@ footer {
   color: #155724;
 }
 
+/* Animation for success message */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) translateX(-50%);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0) translateX(-50%);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0) translateX(-50%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) translateX(-50%);
+  }
+}
+
 /* Media Queries */
 @media screen and (max-width: 768px) {
   .col-md-4 {
@@ -412,18 +432,12 @@ footer {
   }
 }
 
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-  .col-md-4 {
-    flex: 0 0 50%;
-    max-width: 50%;
-    margin-bottom: 2.5rem; /* Añadido para tablets */
+@media screen and (max-width: 576px) {
+  .card-title {
+    font-size: 1.3rem;
   }
-}
-
-/* Añadida clase utilitaria para más espaciado vertical cuando sea necesario */
-.mb-5 {
-  margin-bottom: 3rem;
-}
-.mt-5 {
-  margin-top: 3rem;
+  
+  .section-title {
+    font-size: 2rem;
+  }
 }

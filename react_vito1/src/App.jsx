@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -10,6 +10,18 @@ function App() {
   const [total, setTotal] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState("login"); // login, register, home
+  const [successMessage, setSuccessMessage] = useState("");
+
+  // Clear success message after 3 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   const addToCart = (pizza) => {
     setCart([...cart, pizza]);
@@ -20,11 +32,13 @@ function App() {
   const handleLogin = () => {
     setIsLoggedIn(true);
     setCurrentPage("home");
+    setSuccessMessage("¡Sesión iniciada correctamente!");
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     setCurrentPage("login");
+    setSuccessMessage("¡Sesión cerrada correctamente!");
   };
 
   const handleRegisterSuccess = () => {
@@ -46,6 +60,29 @@ function App() {
   return (
     <>
       <Navbar cartTotal={total} isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      
+      {successMessage && (
+        <div 
+          style={{
+            position: "fixed",
+            top: "80px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor: "#d4edda",
+            color: "#155724",
+            padding: "12px 24px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            zIndex: "1000",
+            textAlign: "center",
+            maxWidth: "90%",
+            minWidth: "300px",
+            animation: "fadeInOut 3s forwards"
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
       
       {!isLoggedIn && (
         <div style={{
