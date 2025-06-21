@@ -1,10 +1,63 @@
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import CardPizza from '../components/CardPizza';
 
 const Home = ({ addToCart }) => {
+  const [pizzas, setPizzas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPizzas = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/pizzas');
+        if (!response.ok) {
+          throw new Error('Error al cargar las pizzas');
+        }
+        const data = await response.json();
+        setPizzas(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPizzas();
+  }, []);
+  const handleAddToCart = (pizza) => {
+    addToCart(pizza);
+  };
+
   const handleViewDetails = (pizzaName) => {
     alert(`Detalles de Pizza ${pizzaName}`);
   };
+
+  if (loading) {
+    return (
+      <div>
+        <Header />
+        <main className="container my-5">
+          <div className="text-center">
+            <p>Cargando pizzas...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <Header />
+        <main className="container my-5">
+          <div className="text-center">
+            <p>Error: {error}</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -12,36 +65,18 @@ const Home = ({ addToCart }) => {
       <main className="container my-5">
         <h2 className="section-title text-center mb-4">Nuestras Pizzas</h2>
         <div className="row">
-          <div className="col-md-4 mb-4">
-            <CardPizza
-              name="Napolitana"
-              price={5950}
-              ingredients={["mozzarella", "tomates", "jamón", "orégano"]}
-              img="https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fpizza-1239077_640_cl.jpg?alt=media&token=6a9a33da-5c00-49d4-9"
-              onAddToCart={addToCart}
-              onViewDetails={() => handleViewDetails("Napolitana")}
-            />
-          </div>
-          <div className="col-md-4 mb-4">
-            <CardPizza
-              name="Española"
-              price={6950}
-              ingredients={["mozzarella", "gorgonzola", "parmesano", "provolone"]}
-              img="https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fcheese-164872_640_com.jpg?alt=media&token=18b2b821-4d0d-43f2-a1c6-8c57bc388fab"
-              onAddToCart={addToCart}
-              onViewDetails={() => handleViewDetails("Española")}
-            />
-          </div>
-          <div className="col-md-4 mb-4">
-            <CardPizza
-              name="Pepperoni"
-              price={6950}
-              ingredients={["mozzarella", "pepperoni", "orégano"]}
-              img="https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fpizza-1239077_640_com.jpg?alt=media&token=e7cde87a-08d5-4040-ac54-90f6c31eb3e3"
-              onAddToCart={addToCart}
-              onViewDetails={() => handleViewDetails("Pepperoni")}
-            />
-          </div>
+          {pizzas.map((pizza) => (
+            <div key={pizza.id} className="col-md-4 mb-4">
+              <CardPizza
+                name={pizza.name}
+                price={pizza.price}
+                ingredients={pizza.ingredients}
+                img={pizza.img}
+                onAddToCart={() => handleAddToCart(pizza)}
+                onViewDetails={() => handleViewDetails(pizza.name)}
+              />
+            </div>
+          ))}
         </div>
       </main>
     </div>

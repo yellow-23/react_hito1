@@ -4,13 +4,23 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import Pizza from "./components/Pizza";
 
 function App() {
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentPage, setCurrentPage] = useState("login"); // login, register, home
+  const [currentPage, setCurrentPage] = useState("login"); // login, register, home, pizza
   const [successMessage, setSuccessMessage] = useState("");
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
+
+  // Check if user is logged in on app start
+  useEffect(() => {
+    if (token) {
+      setIsLoggedIn(true);
+      setCurrentPage("home");
+    }
+  }, [token]);
 
   // Clear success message after 3 seconds
   useEffect(() => {
@@ -23,43 +33,112 @@ function App() {
     }
   }, [successMessage]);
 
-  const addToCart = (pizza) => {
-    setCart([...cart, pizza]);
-    setTotal(total + pizza.price);
-    alert(`${pizza.name} agregada al carrito`);
-  };
+  // Calculate cart total
+  useEffect(() => {
+    const newTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    setTotal(newTotal);
+  }, [cart]);
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    setCurrentPage("home");
-    setSuccessMessage("¡Sesión iniciada correctamente!");
+  const addToCart = (pizza) => {
+    const existingItem = cart.find(item => item.id === pizza.id);
+    
+    if (existingItem) {
+      setCart(cart.map(item => 
+        item.id === pizza.id 
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ));
+    } else {
+      setCart([...cart, { ...pizza, quantity: 1 }]);
+    }
+    
+    setSuccessMessage(`${pizza.name} agregada al carrito`);
+  };
+//coneccion al backend para login y registro
+  const handleLogin = async (email, password) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        setToken(data.token);
+        setIsLoggedIn(true);
+        setCurrentPage("home");
+        setSuccessMessage("¡Sesión iniciada correctamente!");
+        return { success: true };
+      } else {
+        return { success: false, error: data.error || 'Error al iniciar sesión' };
+      }
+    } catch (error) {
+      return { success: false, error: 'Error de conexión' };
+    }
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
     setIsLoggedIn(false);
     setCurrentPage("login");
+    setCart([]);
+    setTotal(0);
     setSuccessMessage("¡Sesión cerrada correctamente!");
   };
 
-  const handleRegisterSuccess = () => {
-    setCurrentPage("login");
+  const handleRegister = async (email, password) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setCurrentPage("login");
+        setSuccessMessage("¡Usuario registrado correctamente! Ahora puedes iniciar sesión.");
+        return { success: true };
+      } else {
+        return { success: false, error: data.error || 'Error al registrar usuario' };
+      }
+    } catch (error) {
+      return { success: false, error: 'Error de conexión' };
+    }
   };
 
   const renderPage = () => {
     if (isLoggedIn) {
+      if (currentPage === "pizza") {
+        return <Pizza pizzaId="p001" onAddToCart={addToCart} />;
+      }
       return <Home addToCart={addToCart} />;
     } else {
       if (currentPage === "register") {
-        return <RegisterPage onRegisterSuccess={handleRegisterSuccess} />;
+        return <RegisterPage onRegister={handleRegister} />;
       } else {
-        return <LoginPage onLoginSuccess={handleLogin} />;
+        return <LoginPage onLogin={handleLogin} />;
       }
     }
   };
 
   return (
     <>
-      <Navbar cartTotal={total} isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      <Navbar 
+        cartTotal={total} 
+        isLoggedIn={isLoggedIn} 
+        onLogout={handleLogout}
+        cartItems={cart.reduce((sum, item) => sum + item.quantity, 0)}
+      />
       
       {successMessage && (
         <div 

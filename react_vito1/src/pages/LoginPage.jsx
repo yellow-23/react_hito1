@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 
-const LoginPage = ({ onLoginSuccess }) => {
+const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
-  
-  // Default credentials
-  const DEFAULT_EMAIL = 'admin@admin.com';
-  const DEFAULT_PASSWORD = 'admin123';
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,17 +16,26 @@ const LoginPage = ({ onLoginSuccess }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     
-    // Check credentials
-    if (formData.email === DEFAULT_EMAIL && formData.password === DEFAULT_PASSWORD) {
-      // Login successful
-      onLoginSuccess();
-    } else {
-      setError('Credenciales inválidas. Por favor, inténtalo de nuevo.');
+    // Validate form
+    if (!formData.email || !formData.password) {
+      setError('Por favor, completa todos los campos');
+      setLoading(false);
+      return;
     }
+
+    // Call login function
+    const result = await onLogin(formData.email, formData.password);
+    
+    if (!result.success) {
+      setError(result.error);
+    }
+    
+    setLoading(false);
   };
 
   return (
@@ -50,134 +56,122 @@ const LoginPage = ({ onLoginSuccess }) => {
         borderRadius: "16px",
         boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)"
       }}>
-        <h2 style={{
-          fontSize: "1.8rem",
-          fontWeight: "700",
-          marginBottom: "8px",
-          background: "linear-gradient(135deg, #ff6b6b, #ff9f1c)",
-          WebkitBackgroundClip: "text",
-          backgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          textAlign: "center"
-        }}>
-          Mamma Mía!
-        </h2>
-        
-        <p style={{
+        <div style={{
           textAlign: "center",
-          color: "#666",
-          marginBottom: "30px",
-          fontSize: "0.9rem"
+          marginBottom: "30px"
         }}>
-          Inicia sesión para continuar
-        </p>
-        
-        {error && (
-          <div style={{
-            backgroundColor: "#f8d7da",
-            color: "#721c24",
-            padding: "12px 16px",
-            borderRadius: "8px",
-            marginBottom: "20px",
-            border: "1px solid #f5c6cb"
+          <h2 style={{
+            color: "#333",
+            fontSize: "2rem",
+            fontWeight: "700",
+            marginBottom: "8px",
+            background: "linear-gradient(135deg, #ff6b6b, #ff9f1c)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text"
           }}>
-            {error}
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit}>
+            Iniciar Sesión
+          </h2>
+          <p style={{
+            color: "#666",
+            fontSize: "0.95rem"
+          }}>
+            Accede a tu cuenta para continuar
+          </p>
+     
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ width: "100%" }}>
           <div style={{ marginBottom: "20px" }}>
-            <label htmlFor="email" style={{
+            <label style={{
               display: "block",
               marginBottom: "8px",
+              color: "#333",
               fontWeight: "600",
-              color: "#292f36",
               fontSize: "0.9rem"
             }}>
-              Email
+              Email:
             </label>
             <input
               type="email"
-              id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="admin@admin.com"
-              required
+              placeholder="Ingresa tu email"
               style={{
                 width: "100%",
                 padding: "12px 16px",
-                border: "1px solid #ddd",
+                border: "2px solid #e1e5e9",
                 borderRadius: "8px",
                 fontSize: "1rem",
-                backgroundColor: "#f8f9fa",
+                transition: "border-color 0.3s ease, box-shadow 0.3s ease",
                 outline: "none",
-                transition: "border-color 0.3s"
+                backgroundColor: "#f8f9fa"
               }}
-              onFocus={(e) => e.target.style.borderColor = "#ff6b6b"}
-              onBlur={(e) => e.target.style.borderColor = "#ddd"}
             />
           </div>
-          
-          <div style={{ marginBottom: "30px" }}>
-            <label htmlFor="password" style={{
+
+          <div style={{ marginBottom: "25px" }}>
+            <label style={{
               display: "block",
               marginBottom: "8px",
+              color: "#333",
               fontWeight: "600",
-              color: "#292f36",
               fontSize: "0.9rem"
             }}>
-              Password
+              Contraseña:
             </label>
             <input
               type="password"
-              id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="admin123"
-              required
+              placeholder="Ingresa tu contraseña"
               style={{
                 width: "100%",
                 padding: "12px 16px",
-                border: "1px solid #ddd",
+                border: "2px solid #e1e5e9",
                 borderRadius: "8px",
                 fontSize: "1rem",
-                backgroundColor: "#f8f9fa",
+                transition: "border-color 0.3s ease, box-shadow 0.3s ease",
                 outline: "none",
-                transition: "border-color 0.3s"
+                backgroundColor: "#f8f9fa"
               }}
-              onFocus={(e) => e.target.style.borderColor = "#ff6b6b"}
-              onBlur={(e) => e.target.style.borderColor = "#ddd"}
             />
           </div>
-          
-          <button 
+
+          {error && (
+            <div style={{
+              color: "#dc3545",
+              backgroundColor: "#f8d7da",
+              border: "1px solid #f5c6cb",
+              padding: "12px",
+              borderRadius: "6px",
+              marginBottom: "20px",
+              fontSize: "0.9rem",
+              textAlign: "center"
+            }}>
+              {error}
+            </div>
+          )}
+
+          <button
             type="submit"
+            disabled={loading}
             style={{
               width: "100%",
-              background: "linear-gradient(135deg, #ff6b6b, #ff9f1c)",
+              padding: "14px",
+              background: loading ? "#ccc" : "linear-gradient(135deg, #ff6b6b, #ff9f1c)",
               color: "white",
               border: "none",
-              padding: "12px 24px",
-              borderRadius: "50px",
+              borderRadius: "8px",
               fontSize: "1rem",
               fontWeight: "600",
-              cursor: "pointer",
-              transition: "all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)",
-              textTransform: "uppercase",
-              letterSpacing: "1px"
-            }}
-            onMouseOver={(e) => {
-              e.target.style.transform = "translateY(-3px)";
-              e.target.style.boxShadow = "0 5px 15px rgba(255, 107, 107, 0.4)";
-            }}
-            onMouseOut={(e) => {
-              e.target.style.transform = "translateY(0px)";
-              e.target.style.boxShadow = "none";
+              cursor: loading ? "not-allowed" : "pointer",
+              transition: "all 0.3s ease"
             }}
           >
-            Iniciar Sesión
+            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
       </div>

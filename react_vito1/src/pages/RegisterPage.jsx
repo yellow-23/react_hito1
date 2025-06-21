@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
-const RegisterPage = ({ onRegisterSuccess }) => {
+const RegisterPage = ({ onRegister }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: ''
   });
-  const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -15,64 +15,50 @@ const RegisterPage = ({ onRegisterSuccess }) => {
       ...formData,
       [name]: value
     });
-    // Clear specific error when user starts typing
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: ''
-      });
-    }
   };
 
   const validateForm = () => {
-    const newErrors = {};
-    
-    // Email validation
-    if (!formData.email.trim()) {
-      newErrors.email = 'El email es obligatorio';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'El formato de email no es válido';
+    if (!formData.email || !formData.password || !formData.confirmPassword) {
+      setError('Por favor, completa todos los campos');
+      return false;
     }
-    
-    // Password validation
-    if (!formData.password) {
-      newErrors.password = 'La contraseña es obligatoria';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+
+    if (formData.password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      return false;
     }
-    
-    // Confirm password validation
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Confirmar contraseña es obligatorio';
-    } else if (formData.confirmPassword !== formData.password) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return false;
     }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Por favor, ingresa un email válido');
+      return false;
+    }
+
+    return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSuccessMessage('');
+    setError('');
     
-    if (validateForm()) {
-      // If validation passes, show success message
-      setSuccessMessage('¡Registro exitoso! Ya puedes iniciar sesión.');
-      // Reset form
-      setFormData({
-        email: '',
-        password: '',
-        confirmPassword: ''
-      });
-      
-      // Optional: call onRegisterSuccess after a delay
-      setTimeout(() => {
-        if (onRegisterSuccess) {
-          onRegisterSuccess();
-        }
-      }, 2000);
+    if (!validateForm()) {
+      return;
     }
+
+    setLoading(true);
+    
+    const result = await onRegister(formData.email, formData.password);
+    
+    if (!result.success) {
+      setError(result.error);
+    }
+    
+    setLoading(false);
   };
 
   return (
@@ -93,194 +79,150 @@ const RegisterPage = ({ onRegisterSuccess }) => {
         borderRadius: "16px",
         boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)"
       }}>
-        <h2 style={{
-          fontSize: "1.8rem",
-          fontWeight: "700",
-          marginBottom: "8px",
-          background: "linear-gradient(135deg, #ff6b6b, #ff9f1c)",
-          WebkitBackgroundClip: "text",
-          backgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          textAlign: "center"
-        }}>
-          Mamma Mía!
-        </h2>
-        
-        <p style={{
+        <div style={{
           textAlign: "center",
-          color: "#666",
-          marginBottom: "30px",
-          fontSize: "0.9rem"
+          marginBottom: "30px"
         }}>
-          Crea tu cuenta para continuar
-        </p>
-        
-        {successMessage && (
-          <div style={{
-            backgroundColor: "#d4edda",
-            color: "#155724",
-            padding: "12px 16px",
-            borderRadius: "8px",
-            marginBottom: "20px",
-            border: "1px solid #c3e6cb"
+          <h2 style={{
+            color: "#333",
+            fontSize: "2rem",
+            fontWeight: "700",
+            marginBottom: "8px",
+            background: "linear-gradient(135deg, #ff6b6b, #ff9f1c)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text"
           }}>
-            {successMessage}
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit}>
+            Registro
+          </h2>
+          <p style={{
+            color: "#666",
+            fontSize: "0.95rem"
+          }}>
+            Crea tu cuenta para comenzar
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ width: "100%" }}>
           <div style={{ marginBottom: "20px" }}>
-            <label htmlFor="email" style={{
+            <label style={{
               display: "block",
               marginBottom: "8px",
+              color: "#333",
               fontWeight: "600",
-              color: "#292f36",
               fontSize: "0.9rem"
             }}>
-              Email
+              Email:
             </label>
             <input
               type="email"
-              id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="ejemplo@mail.com"
-              required
+              placeholder="Ingresa tu email"
               style={{
                 width: "100%",
                 padding: "12px 16px",
-                border: errors.email ? "1px solid #ff6b6b" : "1px solid #ddd",
+                border: "2px solid #e1e5e9",
                 borderRadius: "8px",
                 fontSize: "1rem",
-                backgroundColor: "#f8f9fa",
+                transition: "border-color 0.3s ease",
                 outline: "none",
-                transition: "border-color 0.3s"
+                backgroundColor: "#f8f9fa"
               }}
-              onFocus={(e) => !errors.email && (e.target.style.borderColor = "#ff6b6b")}
-              onBlur={(e) => !errors.email && (e.target.style.borderColor = "#ddd")}
             />
-            {errors.email && (
-              <div style={{
-                color: "#ff6b6b",
-                fontSize: "0.85rem",
-                marginTop: "5px"
-              }}>
-                {errors.email}
-              </div>
-            )}
           </div>
-          
+
           <div style={{ marginBottom: "20px" }}>
-            <label htmlFor="password" style={{
+            <label style={{
               display: "block",
               marginBottom: "8px",
+              color: "#333",
               fontWeight: "600",
-              color: "#292f36",
               fontSize: "0.9rem"
             }}>
-              Contraseña
+              Contraseña:
             </label>
             <input
               type="password"
-              id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Mínimo 6 caracteres"
-              required
+              placeholder="Ingresa tu contraseña"
               style={{
                 width: "100%",
                 padding: "12px 16px",
-                border: errors.password ? "1px solid #ff6b6b" : "1px solid #ddd",
+                border: "2px solid #e1e5e9",
                 borderRadius: "8px",
                 fontSize: "1rem",
-                backgroundColor: "#f8f9fa",
+                transition: "border-color 0.3s ease",
                 outline: "none",
-                transition: "border-color 0.3s"
+                backgroundColor: "#f8f9fa"
               }}
-              onFocus={(e) => !errors.password && (e.target.style.borderColor = "#ff6b6b")}
-              onBlur={(e) => !errors.password && (e.target.style.borderColor = "#ddd")}
             />
-            {errors.password && (
-              <div style={{
-                color: "#ff6b6b",
-                fontSize: "0.85rem",
-                marginTop: "5px"
-              }}>
-                {errors.password}
-              </div>
-            )}
           </div>
 
-          <div style={{ marginBottom: "30px" }}>
-            <label htmlFor="confirmPassword" style={{
+          <div style={{ marginBottom: "25px" }}>
+            <label style={{
               display: "block",
               marginBottom: "8px",
+              color: "#333",
               fontWeight: "600",
-              color: "#292f36",
               fontSize: "0.9rem"
             }}>
-              Confirmar Contraseña
+              Confirmar Contraseña:
             </label>
             <input
               type="password"
-              id="confirmPassword"
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              placeholder="Repite tu contraseña"
-              required
+              placeholder="Confirma tu contraseña"
               style={{
                 width: "100%",
                 padding: "12px 16px",
-                border: errors.confirmPassword ? "1px solid #ff6b6b" : "1px solid #ddd",
+                border: "2px solid #e1e5e9",
                 borderRadius: "8px",
                 fontSize: "1rem",
-                backgroundColor: "#f8f9fa",
+                transition: "border-color 0.3s ease",
                 outline: "none",
-                transition: "border-color 0.3s"
+                backgroundColor: "#f8f9fa"
               }}
-              onFocus={(e) => !errors.confirmPassword && (e.target.style.borderColor = "#ff6b6b")}
-              onBlur={(e) => !errors.confirmPassword && (e.target.style.borderColor = "#ddd")}
             />
-            {errors.confirmPassword && (
-              <div style={{
-                color: "#ff6b6b",
-                fontSize: "0.85rem",
-                marginTop: "5px"
-              }}>
-                {errors.confirmPassword}
-              </div>
-            )}
           </div>
-          
-          <button 
+
+          {error && (
+            <div style={{
+              color: "#dc3545",
+              backgroundColor: "#f8d7da",
+              border: "1px solid #f5c6cb",
+              padding: "12px",
+              borderRadius: "6px",
+              marginBottom: "20px",
+              fontSize: "0.9rem",
+              textAlign: "center"
+            }}>
+              {error}
+            </div>
+          )}
+
+          <button
             type="submit"
+            disabled={loading}
             style={{
               width: "100%",
-              background: "linear-gradient(135deg, #ff6b6b, #ff9f1c)",
+              padding: "14px",
+              background: loading ? "#ccc" : "linear-gradient(135deg, #ff6b6b, #ff9f1c)",
               color: "white",
               border: "none",
-              padding: "12px 24px",
-              borderRadius: "50px",
+              borderRadius: "8px",
               fontSize: "1rem",
               fontWeight: "600",
-              cursor: "pointer",
-              transition: "all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)",
-              textTransform: "uppercase",
-              letterSpacing: "1px"
-            }}
-            onMouseOver={(e) => {
-              e.target.style.transform = "translateY(-3px)";
-              e.target.style.boxShadow = "0 5px 15px rgba(255, 107, 107, 0.4)";
-            }}
-            onMouseOut={(e) => {
-              e.target.style.transform = "translateY(0px)";
-              e.target.style.boxShadow = "none";
+              cursor: loading ? "not-allowed" : "pointer",
+              transition: "all 0.3s ease"
             }}
           >
-            Registrarse
+            {loading ? 'Registrando...' : 'Registrarse'}
           </button>
         </form>
       </div>
