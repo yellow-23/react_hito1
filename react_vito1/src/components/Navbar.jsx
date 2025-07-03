@@ -1,37 +1,43 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { FaShoppingCart } from "react-icons/fa";
 
 const Navbar = ({ cartTotal = 0, isLoggedIn = false, onLogout, cartItems = 0 }) => {
   return (
     <nav className="navbar">
       <div className="container d-flex justify-content-between align-items-center">
-        <a className="navbar-brand" href="#">
+        <Link className="navbar-brand" to="/">
           Mamma Mía!
-        </a>
+        </Link>
 
         <div className="navbar-nav d-flex align-items-center flex-grow-1">
-          {isLoggedIn && (
+          {isLoggedIn ? (
             <>
-              <a className="nav-link" href="#">
-                Inicio
-              </a>
-              <a className="nav-link" href="#">
-                Menú
-              </a>
-              <a className="nav-link" href="#">
-                Contacto
-              </a>                
-              <a className="nav-link cart-link shoppingkart" href="#" style={{
-              }}>
-                <FaShoppingCart /> Carrito: ${cartTotal.toLocaleString()}
-              </a>
+              <Link className="nav-link" to="/">
+                🍕 Home
+              </Link>
+              <Link className="nav-link" to="/profile">
+                🔒 Profile
+              </Link>
+              <Link className="nav-link cart-link shoppingkart" to="/cart">
+                <FaShoppingCart /> Total: ${cartTotal.toLocaleString()}
+              </Link>
               <button
                 className="nav-link ms-auto"
                 onClick={onLogout}
                 style={{ background: "none", border: "none" }}
               >
-                Cerrar Sesión
+                🔓 Logout
               </button>
+            </>
+          ) : (
+            <>
+              <Link className="nav-link" to="/login">
+                🔐 Login
+              </Link>
+              <Link className="nav-link" to="/register">
+                🔐 Register
+              </Link>
             </>
           )}
         </div>

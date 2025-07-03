@@ -29,8 +29,8 @@ const Home = ({ addToCart }) => {
     addToCart(pizza);
   };
 
-  const handleViewDetails = (pizzaName) => {
-    alert(`Detalles de Pizza ${pizzaName}`);
+  const handleViewDetails = (pizzaId) => {
+    // La navegación ahora se maneja con Link en CardPizza
   };
 
   if (loading) {
@@ -72,8 +72,9 @@ const Home = ({ addToCart }) => {
                 price={pizza.price}
                 ingredients={pizza.ingredients}
                 img={pizza.img}
+                pizzaId={pizza.id}
                 onAddToCart={() => handleAddToCart(pizza)}
-                onViewDetails={() => handleViewDetails(pizza.name)}
+                onViewDetails={() => handleViewDetails(pizza.id)}
               />
             </div>
           ))}

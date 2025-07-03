@@ -5,13 +5,13 @@
     "id": "UYz_2Vy9rNw7uELQ7AZ8D"
   },
   {
-    "email": "cristobal.floresv@gmail.com",
-    "password": "971117am",
-    "id": "9ptJ28wo0xRFSLUf2Hh91"
-  },
-  {
     "email": "prueba@prueba.com",
     "password": "123456",
     "id": "Kj2WCgJEHgpIkEoqwrB6Q"
+  },
+  {
+    "email": "prueba@gmail.com",
+    "password": "admin123",
+    "id": "LGKSE7ckfBl6PTGboriNq"
   }
 ]

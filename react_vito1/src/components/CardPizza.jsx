@@ -1,15 +1,17 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const CardPizza = ({
   name,
   price,
   ingredients,
   img,
+  pizzaId,
   onAddToCart,
   onViewDetails,
 }) => {
   const handleAddToCart = () => {
-    onAddToCart({ name, price, ingredients });
+    onAddToCart({ name, price, ingredients, id: pizzaId, img });
   };
 
   return (
@@ -40,9 +42,9 @@ const CardPizza = ({
         <div className="price">${price.toLocaleString()}</div>
 
         <div className="btn-container">
-          <button className="btn btn-outline" onClick={onViewDetails}>
+          <Link to={`/pizza/${pizzaId}`} className="btn btn-outline">
             Ver Detalles
-          </button>
+          </Link>
           <button className="btn btn-primary" onClick={handleAddToCart}>
             Añadir
           </button>

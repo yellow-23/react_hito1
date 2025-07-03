@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import Pizza from "./components/Pizza";
+import Cart from "./pages/Cart";
+import Pizza from "./pages/Pizza";
+import Profile from "./pages/Profile";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentPage, setCurrentPage] = useState("login"); // login, register, home, pizza
   const [successMessage, setSuccessMessage] = useState("");
   const [token, setToken] = useState(localStorage.getItem('token') || null);
 
@@ -18,7 +21,6 @@ function App() {
   useEffect(() => {
     if (token) {
       setIsLoggedIn(true);
-      setCurrentPage("home");
     }
   }, [token]);
 
@@ -54,7 +56,27 @@ function App() {
     
     setSuccessMessage(`${pizza.name} agregada al carrito`);
   };
-//coneccion al backend para login y registro
+
+  const incrementQuantity = (id) => {
+    setCart(cart.map(item => 
+      item.id === id 
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    ));
+  };
+
+  const decrementQuantity = (id) => {
+    setCart(cart.map(item => 
+      item.id === id 
+        ? { ...item, quantity: Math.max(1, item.quantity - 1) }
+        : item
+    ));
+  };
+
+  const removeFromCart = (id) => {
+    setCart(cart.filter(item => item.id !== id));
+  };
+
   const handleLogin = async (email, password) => {
     try {
       const response = await fetch('http://localhost:5000/api/auth/login', {
@@ -71,7 +93,6 @@ function App() {
         localStorage.setItem('token', data.token);
         setToken(data.token);
         setIsLoggedIn(true);
-        setCurrentPage("home");
         setSuccessMessage("¡Sesión iniciada correctamente!");
         return { success: true };
       } else {
@@ -86,7 +107,6 @@ function App() {
     localStorage.removeItem('token');
     setToken(null);
     setIsLoggedIn(false);
-    setCurrentPage("login");
     setCart([]);
     setTotal(0);
     setSuccessMessage("¡Sesión cerrada correctamente!");
@@ -105,7 +125,6 @@ function App() {
       const data = await response.json();
 
       if (response.ok) {
-        setCurrentPage("login");
         setSuccessMessage("¡Usuario registrado correctamente! Ahora puedes iniciar sesión.");
         return { success: true };
       } else {
@@ -113,21 +132,6 @@ function App() {
       }
     } catch (error) {
       return { success: false, error: 'Error de conexión' };
-    }
-  };
-
-  const renderPage = () => {
-    if (isLoggedIn) {
-      if (currentPage === "pizza") {
-        return <Pizza pizzaId="p001" onAddToCart={addToCart} />;
-      }
-      return <Home addToCart={addToCart} />;
-    } else {
-      if (currentPage === "register") {
-        return <RegisterPage onRegister={handleRegister} />;
-      } else {
-        return <LoginPage onLogin={handleLogin} />;
-      }
     }
   };
 
@@ -163,49 +167,76 @@ function App() {
         </div>
       )}
       
-      {!isLoggedIn && (
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          padding: "20px 0 10px 0"
-        }}>
-          <button 
-            onClick={() => setCurrentPage("login")} 
-            style={{
-              background: currentPage === "login" ? "linear-gradient(135deg, #ff6b6b, #ff9f1c)" : "transparent",
-              color: currentPage === "login" ? "white" : "#ff6b6b",
-              border: "2px solid #ff6b6b",
-              padding: "8px 20px",
-              borderRadius: "25px",
-              marginRight: "10px",
-              cursor: "pointer",
-              fontWeight: "600",
-              fontSize: "0.9rem",
-              transition: "all 0.3s"
-            }}
-          >
-            Iniciar Sesión
-          </button>
-          <button 
-            onClick={() => setCurrentPage("register")} 
-            style={{
-              background: currentPage === "register" ? "linear-gradient(135deg, #ff6b6b, #ff9f1c)" : "transparent",
-              color: currentPage === "register" ? "white" : "#ff6b6b",
-              border: "2px solid #ff6b6b",
-              padding: "8px 20px",
-              borderRadius: "25px",
-              cursor: "pointer",
-              fontWeight: "600",
-              fontSize: "0.9rem",
-              transition: "all 0.3s"
-            }}
-          >
-            Registro
-          </button>
-        </div>
-      )}
-      
-      {renderPage()}
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            isLoggedIn ? (
+              <Home addToCart={addToCart} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          } 
+        />
+        <Route 
+          path="/login" 
+          element={
+            isLoggedIn ? (
+              <Navigate to="/" replace />
+            ) : (
+              <LoginPage onLogin={handleLogin} />
+            )
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
+            isLoggedIn ? (
+              <Navigate to="/" replace />
+            ) : (
+              <RegisterPage onRegister={handleRegister} />
+            )
+          } 
+        />
+        <Route 
+          path="/cart" 
+          element={
+            isLoggedIn ? (
+              <Cart 
+                cart={cart}
+                total={total}
+                onIncrement={incrementQuantity}
+                onDecrement={decrementQuantity}
+                onRemove={removeFromCart}
+              />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          } 
+        />
+        <Route 
+          path="/pizza/:id" 
+          element={
+            isLoggedIn ? (
+              <Pizza onAddToCart={addToCart} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          } 
+        />
+        <Route 
+          path="/profile" 
+          element={
+            isLoggedIn ? (
+              <Profile onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          } 
+        />
+        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
+      </Routes>
       
       <Footer />
     </>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
-const Pizza = ({ pizzaId = 'p001', onAddToCart }) => {
+const Pizza = ({ onAddToCart }) => {
+  const { id } = useParams();
   const [pizza, setPizza] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -9,7 +11,7 @@ const Pizza = ({ pizzaId = 'p001', onAddToCart }) => {
     const fetchPizza = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/pizzas/${pizzaId}`);
+        const response = await fetch(`http://localhost:5000/api/pizzas/${id}`);
         if (!response.ok) {
           throw new Error('Error al cargar la pizza');
         }
@@ -23,7 +25,7 @@ const Pizza = ({ pizzaId = 'p001', onAddToCart }) => {
     };
 
     fetchPizza();
-  }, [pizzaId]);
+  }, [id]);
 
   const handleAddToCart = () => {
     if (onAddToCart) {
