@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import { usePizza } from '../context/PizzaContext';
 
-const Pizza = ({ onAddToCart }) => {
+const Pizza = () => {
   const { id } = useParams();
+  const { addToCart } = useCart();
+  const { getPizzaById } = usePizza();
   const [pizza, setPizza] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const fetchPizza = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/pizzas/${id}`);
-        if (!response.ok) {
-          throw new Error('Error al cargar la pizza');
-        }
-        const data = await response.json();
+        const data = await getPizzaById(id);
         setPizza(data);
       } catch (error) {
         setError(error.message);
@@ -25,14 +26,16 @@ const Pizza = ({ onAddToCart }) => {
     };
 
     fetchPizza();
-  }, [id]);
+  }, [id, getPizzaById]);
 
   const handleAddToCart = () => {
-    if (onAddToCart) {
-      onAddToCart(pizza);
-    } else {
-      alert(`${pizza.name} agregada al carrito`);
-    }
+    addToCart(pizza);
+    setSuccessMessage(`${pizza.name} agregada al carrito`);
+    
+    // Limpiar mensaje después de 3 segundos
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
   };
 
   if (loading) {
@@ -67,6 +70,25 @@ const Pizza = ({ onAddToCart }) => {
 
   return (
     <div className="container my-5">
+      {successMessage && (
+        <div 
+          style={{
+            position: "fixed",
+            top: "80px",
+            right: "20px",
+            backgroundColor: "#d4edda",
+            color: "#155724",
+            padding: "12px 24px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            zIndex: "1000",
+            textAlign: "center"
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
+      
       <div className="row">
         <div className="col-md-6">
           <img 

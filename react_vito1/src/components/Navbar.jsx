@@ -1,8 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaShoppingCart } from "react-icons/fa";
+import { useCart } from "../context/CartContext";
 
-const Navbar = ({ cartTotal = 0, isLoggedIn = false, onLogout, cartItems = 0 }) => {
+const Navbar = ({ isLoggedIn = false, onLogout }) => {
+  const { total } = useCart();
+
   return (
     <nav className="navbar">
       <div className="container d-flex justify-content-between align-items-center">
@@ -20,7 +23,7 @@ const Navbar = ({ cartTotal = 0, isLoggedIn = false, onLogout, cartItems = 0 }) 
                 🔒 Profile
               </Link>
               <Link className="nav-link cart-link shoppingkart" to="/cart">
-                <FaShoppingCart /> Total: ${cartTotal.toLocaleString()}
+                <FaShoppingCart /> Total: ${total.toLocaleString()}
               </Link>
               <button
                 className="nav-link ms-auto"

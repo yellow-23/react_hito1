@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useCart } from "./context/CartContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -11,11 +12,10 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 function App() {
-  const [cart, setCart] = useState([]);
-  const [total, setTotal] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [token, setToken] = useState(localStorage.getItem('token') || null);
+  const { clearCart } = useCart();
 
   // Check if user is logged in on app start
   useEffect(() => {
@@ -34,48 +34,6 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
-
-  // Calculate cart total
-  useEffect(() => {
-    const newTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    setTotal(newTotal);
-  }, [cart]);
-
-  const addToCart = (pizza) => {
-    const existingItem = cart.find(item => item.id === pizza.id);
-    
-    if (existingItem) {
-      setCart(cart.map(item => 
-        item.id === pizza.id 
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      ));
-    } else {
-      setCart([...cart, { ...pizza, quantity: 1 }]);
-    }
-    
-    setSuccessMessage(`${pizza.name} agregada al carrito`);
-  };
-
-  const incrementQuantity = (id) => {
-    setCart(cart.map(item => 
-      item.id === id 
-        ? { ...item, quantity: item.quantity + 1 }
-        : item
-    ));
-  };
-
-  const decrementQuantity = (id) => {
-    setCart(cart.map(item => 
-      item.id === id 
-        ? { ...item, quantity: Math.max(1, item.quantity - 1) }
-        : item
-    ));
-  };
-
-  const removeFromCart = (id) => {
-    setCart(cart.filter(item => item.id !== id));
-  };
 
   const handleLogin = async (email, password) => {
     try {
@@ -107,8 +65,7 @@ function App() {
     localStorage.removeItem('token');
     setToken(null);
     setIsLoggedIn(false);
-    setCart([]);
-    setTotal(0);
+    clearCart(); // Usar clearCart del contexto
     setSuccessMessage("¡Sesión cerrada correctamente!");
   };
 
@@ -138,10 +95,8 @@ function App() {
   return (
     <>
       <Navbar 
-        cartTotal={total} 
         isLoggedIn={isLoggedIn} 
         onLogout={handleLogout}
-        cartItems={cart.reduce((sum, item) => sum + item.quantity, 0)}
       />
       
       {successMessage && (
@@ -172,7 +127,7 @@ function App() {
           path="/" 
           element={
             isLoggedIn ? (
-              <Home addToCart={addToCart} />
+              <Home />
             ) : (
               <Navigate to="/login" replace />
             )
@@ -202,13 +157,7 @@ function App() {
           path="/cart" 
           element={
             isLoggedIn ? (
-              <Cart 
-                cart={cart}
-                total={total}
-                onIncrement={incrementQuantity}
-                onDecrement={decrementQuantity}
-                onRemove={removeFromCart}
-              />
+              <Cart />
             ) : (
               <Navigate to="/login" replace />
             )
@@ -218,7 +167,7 @@ function App() {
           path="/pizza/:id" 
           element={
             isLoggedIn ? (
-              <Pizza onAddToCart={addToCart} />
+              <Pizza />
             ) : (
               <Navigate to="/login" replace />
             )

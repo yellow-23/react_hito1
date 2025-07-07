@@ -1,36 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useCart } from '../context/CartContext';
+import { usePizza } from '../context/PizzaContext';
 import Header from '../components/Header';
 import CardPizza from '../components/CardPizza';
 
-const Home = ({ addToCart }) => {
-  const [pizzas, setPizzas] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const Home = () => {
+  const { addToCart } = useCart();
+  const { pizzas, loading, error } = usePizza();
+  const [successMessage, setSuccessMessage] = useState("");
 
-  useEffect(() => {
-    const fetchPizzas = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/pizzas');
-        if (!response.ok) {
-          throw new Error('Error al cargar las pizzas');
-        }
-        const data = await response.json();
-        setPizzas(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPizzas();
-  }, []);
   const handleAddToCart = (pizza) => {
     addToCart(pizza);
+    setSuccessMessage(`${pizza.name} agregada al carrito`);
+    
+    // Limpiar mensaje después de 3 segundos
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
   };
 
   const handleViewDetails = (pizzaId) => {
-    // La navegación ahora se maneja con Link en CardPizza
+    // La navegación se maneja con Link en CardPizza
   };
 
   if (loading) {
@@ -62,9 +52,29 @@ const Home = ({ addToCart }) => {
   return (
     <div>
       <Header />
+      
+      {successMessage && (
+        <div 
+          style={{
+            position: "fixed",
+            top: "80px",
+            right: "20px",
+            backgroundColor: "#d4edda",
+            color: "#155724",
+            padding: "12px 24px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            zIndex: "1000",
+            textAlign: "center"
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
+      
       <main className="container my-5">
-        <h2 className="section-title text-center mb-4">Nuestras Pizzas</h2>
-        <div className="row">
+        <h2 className="section-title text-center mb-5">🍕 Nuestras Deliciosas Pizzas</h2>
+        <div className="row" style={{ marginTop: '3rem' }}>
           {pizzas.map((pizza) => (
             <div key={pizza.id} className="col-md-4 mb-4">
               <CardPizza
