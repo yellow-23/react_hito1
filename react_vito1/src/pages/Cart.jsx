@@ -1,8 +1,10 @@
 import React from 'react';
 import { useCart } from '../context/CartContext';
+import { useUser } from '../context/UserContext';
 
 const Cart = () => {
   const { cart, total, incrementQuantity, decrementQuantity, removeFromCart } = useCart();
+  const { token } = useUser();
 
   console.log('Cart data:', cart); // Debug log
 
@@ -215,8 +217,9 @@ const Cart = () => {
               
               <hr style={{ margin: '1.5rem 0', border: '1px solid #e9ecef' }} />
               
-              <button 
+              <button
                 className="btn w-100"
+                disabled={!token}
                 style={{
                   background: 'linear-gradient(135deg, #28a745, #20c997)',
                   border: 'none',

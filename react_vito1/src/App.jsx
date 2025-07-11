@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useCart } from "./context/CartContext";
+import { useUser } from "./context/UserContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -10,19 +10,12 @@ import Cart from "./pages/Cart";
 import Pizza from "./pages/Pizza";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [token, setToken] = useState(localStorage.getItem('token') || null);
-  const { clearCart } = useCart();
-
-  // Check if user is logged in on app start
-  useEffect(() => {
-    if (token) {
-      setIsLoggedIn(true);
-    }
-  }, [token]);
+  const { token, setToken } = useUser();
+  const isLoggedIn = !!token;
 
   // Clear success message after 3 seconds
   useEffect(() => {
@@ -50,24 +43,16 @@ function App() {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         setToken(data.token);
-        setIsLoggedIn(true);
         setSuccessMessage("¡Sesión iniciada correctamente!");
         return { success: true };
       } else {
         return { success: false, error: data.error || 'Error al iniciar sesión' };
       }
-    } catch (error) {
+    } catch {
       return { success: false, error: 'Error de conexión' };
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    setIsLoggedIn(false);
-    clearCart(); // Usar clearCart del contexto
-    setSuccessMessage("¡Sesión cerrada correctamente!");
-  };
 
   const handleRegister = async (email, password) => {
     try {
@@ -87,17 +72,14 @@ function App() {
       } else {
         return { success: false, error: data.error || 'Error al registrar usuario' };
       }
-    } catch (error) {
+    } catch {
       return { success: false, error: 'Error de conexión' };
     }
   };
 
   return (
     <>
-      <Navbar 
-        isLoggedIn={isLoggedIn} 
-        onLogout={handleLogout}
-      />
+      <Navbar />
       
       {successMessage && (
         <div 
@@ -173,15 +155,13 @@ function App() {
             )
           } 
         />
-        <Route 
-          path="/profile" 
+        <Route
+          path="/profile"
           element={
-            isLoggedIn ? (
-              <Profile onLogout={handleLogout} />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          } 
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
         />
         <Route path="/404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
