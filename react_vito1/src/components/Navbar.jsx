@@ -2,9 +2,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FaShoppingCart } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
+import { useUser } from "../context/UserContext";
 
-const Navbar = ({ isLoggedIn = false, onLogout }) => {
+const Navbar = () => {
   const { total } = useCart();
+  const { token, logout } = useUser();
+  const isLoggedIn = !!token;
 
   return (
     <nav className="navbar">
@@ -27,7 +30,7 @@ const Navbar = ({ isLoggedIn = false, onLogout }) => {
               </Link>
               <button
                 className="nav-link ms-auto"
-                onClick={onLogout}
+                onClick={logout}
                 style={{ background: "none", border: "none" }}
               >
                 🔓 Logout

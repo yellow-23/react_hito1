@@ -1,6 +1,8 @@
 import React from 'react';
+import { useUser } from '../context/UserContext';
 
-const Profile = ({ onLogout }) => {
+const Profile = () => {
+  const { logout } = useUser();
   // Por ahora usamos datos estáticos como indica el requerimiento
   const userEmail = "usuario@ejemplo.com";
 
@@ -48,9 +50,9 @@ const Profile = ({ onLogout }) => {
                 }}>{userEmail}</p>
               </div>
               
-              <button 
+              <button
                 className="btn btn-danger"
-                onClick={onLogout}
+                onClick={logout}
                 style={{
                   background: 'linear-gradient(135deg, #ff6b6b, #ff9f1c)',
                   border: 'none',

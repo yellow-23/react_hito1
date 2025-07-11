@@ -8,7 +8,6 @@ const CardPizza = ({
   img,
   pizzaId,
   onAddToCart,
-  onViewDetails,
 }) => {
   const handleAddToCart = () => {
     onAddToCart({ name, price, ingredients, id: pizzaId, img });

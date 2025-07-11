@@ -19,9 +19,6 @@ const Home = () => {
     }, 3000);
   };
 
-  const handleViewDetails = (pizzaId) => {
-    // La navegación se maneja con Link en CardPizza
-  };
 
   if (loading) {
     return (
@@ -84,7 +81,6 @@ const Home = () => {
                 img={pizza.img}
                 pizzaId={pizza.id}
                 onAddToCart={() => handleAddToCart(pizza)}
-                onViewDetails={() => handleViewDetails(pizza.id)}
               />
             </div>
           ))}
