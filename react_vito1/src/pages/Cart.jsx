@@ -214,9 +214,7 @@ const Cart = () => {
                   ${(total || 0).toLocaleString()}
                 </strong>
               </div>
-              
-              <hr style={{ margin: '1.5rem 0', border: '1px solid #e9ecef' }} />
-              
+              {/* Botón de pagar deshabilitado si no hay token */}
               <button
                 className="btn w-100"
                 disabled={!token}
@@ -231,15 +229,21 @@ const Cart = () => {
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                   boxShadow: '0 8px 20px rgba(40, 167, 69, 0.3)',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  opacity: !token ? 0.5 : 1,
+                  cursor: !token ? 'not-allowed' : 'pointer'
                 }}
                 onMouseOver={(e) => {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 12px 25px rgba(40, 167, 69, 0.4)';
+                  if (token) {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 12px 25px rgba(40, 167, 69, 0.4)';
+                  }
                 }}
                 onMouseOut={(e) => {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 8px 20px rgba(40, 167, 69, 0.3)';
+                  if (token) {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 8px 20px rgba(40, 167, 69, 0.3)';
+                  }
                 }}
               >
                 💳 Proceder al pago

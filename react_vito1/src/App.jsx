@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useUser } from "./context/UserContext";
+import { useUser, UserProvider } from "./context/UserContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -12,7 +12,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-function App() {
+function AppContent() {
   const [successMessage, setSuccessMessage] = useState("");
   const { token, setToken } = useUser();
   const isLoggedIn = !!token;
@@ -80,7 +80,6 @@ function App() {
   return (
     <>
       <Navbar />
-      
       {successMessage && (
         <div 
           style={{
@@ -103,7 +102,6 @@ function App() {
           {successMessage}
         </div>
       )}
-      
       <Routes>
         <Route 
           path="/" 
@@ -166,10 +164,18 @@ function App() {
         <Route path="/404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
-      
       <Footer />
     </>
   );
+//
+
+function App() {
+  return (
+    <UserProvider>
+      <AppContent />
+    </UserProvider>
+  );
+}
 }
 
 export default App;
