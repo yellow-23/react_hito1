@@ -6,6 +6,7 @@ import { PizzaProvider } from "./context/PizzaContext";
 import { UserProvider } from "./context/UserContext";
 import App from "./App";
 import "./styles.css";
+import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

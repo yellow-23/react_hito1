@@ -106,7 +106,8 @@ const LoginPage = ({ onLogin }) => {
                 fontSize: "1rem",
                 transition: "border-color 0.3s ease, box-shadow 0.3s ease",
                 outline: "none",
-                backgroundColor: "#f8f9fa"
+                backgroundColor: "#fff",
+                color: "#222"
               }}
             />
           </div>
@@ -135,7 +136,8 @@ const LoginPage = ({ onLogin }) => {
                 fontSize: "1rem",
                 transition: "border-color 0.3s ease, box-shadow 0.3s ease",
                 outline: "none",
-                backgroundColor: "#f8f9fa"
+                backgroundColor: "#fff",
+                color: "#222"
               }}
             />
           </div>

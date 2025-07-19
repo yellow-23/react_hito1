@@ -70,19 +70,31 @@ const Home = () => {
       )}
       
       <main className="container my-5">
-        <h2 className="section-title text-center mb-5">🍕 Nuestras Deliciosas Pizzas</h2>
-        <div className="row" style={{ marginTop: '3rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+          <h2
+            className="section-title mb-5"
+            style={{
+              paddingTop: '3rem',
+              paddingBottom: '1rem',
+              fontWeight: 800,
+              letterSpacing: '0.5px',
+              textAlign: 'center',
+              width: '100%'
+            }}
+          >
+            🍕 Nuestras Deliciosas Pizzas
+          </h2>
+        </div>
+        <div className="pizza-grid" style={{ marginTop: '3rem' }}>
           {pizzas.map((pizza) => (
-            <div key={pizza.id} className="col-md-4 mb-4">
-              <CardPizza
-                name={pizza.name}
-                price={pizza.price}
-                ingredients={pizza.ingredients}
-                img={pizza.img}
-                pizzaId={pizza.id}
-                onAddToCart={() => handleAddToCart(pizza)}
-              />
-            </div>
+            <CardPizza
+              key={pizza.id}
+              name={pizza.name}
+              price={pizza.price}
+              img={pizza.img}
+              pizzaId={pizza.id}
+              onAddToCart={handleAddToCart}
+            />
           ))}
         </div>
       </main>

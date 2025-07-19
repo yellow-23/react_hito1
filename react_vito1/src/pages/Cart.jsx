@@ -29,149 +29,156 @@ const Cart = () => {
         marginBottom: '2rem'
       }}>🛒 Carrito de Compras</h2>
       
-      <div className="row">
-        <div className="col-lg-8 mb-4">
+      <div className="row" style={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'flex-start', gap: '2rem' }}>
+        <div className="col-lg-8 mb-4" style={{ flex: '2 1 0%', minWidth: 0 }}>
           {cart.map((item, index) => {
-            // Asegurar que tenemos un ID único
             const uniqueKey = item.id || `item-${index}`;
-            console.log(`Cart item ${index}:`, item);
-            console.log(`Using key: ${uniqueKey}, item.id: ${item.id}`);
-            
             return (
-              <div key={uniqueKey} className="card mb-4" style={{
-                border: 'none',
-                borderRadius: '16px',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.08)',
-                overflow: 'hidden'
-              }}>
-                <div className="row g-0">
-                  <div className="col-md-4">
-                    <div style={{ height: '200px', overflow: 'hidden' }}>
-                      <img 
-                        src={item.img || 'https://via.placeholder.com/300x200?text=Pizza'} 
-                        alt={item.name || 'Pizza'}
-                        className="img-fluid"
-                        style={{ 
-                          height: '100%', 
-                          width: '100%',
-                          objectFit: 'cover',
-                          transition: 'transform 0.3s ease'
-                        }}
-                        onError={(e) => {
-                          e.target.src = 'https://via.placeholder.com/300x200?text=Pizza';
-                        }}
-                      />
-                    </div>
+              <div
+                key={uniqueKey}
+                className="card mb-4"
+                style={{
+                  border: 'none',
+                  borderRadius: '18px',
+                  boxShadow: '0 4px 18px rgba(0,0,0,0.10)',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  minHeight: '180px',
+                  background: '#fff'
+                }}
+              >
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  width: '100%',
+                  minHeight: '180px'
+                }}>
+                  {/* Imagen */}
+                  <div style={{
+                    flex: '0 0 180px',
+                    width: '180px',
+                    height: '180px',
+                    background: '#f8f9fa',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <img
+                      src={item.img || 'https://via.placeholder.com/300x200?text=Pizza'}
+                      alt={item.name || 'Pizza'}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        borderRadius: '18px 0 0 18px'
+                      }}
+                      onError={e => {
+                        e.target.src = 'https://via.placeholder.com/300x200?text=Pizza';
+                      }}
+                    />
                   </div>
-                  <div className="col-md-8">
-                    <div className="card-body h-100 d-flex flex-column justify-content-between" style={{ padding: '1.5rem' }}>
-                      <div>
-                        <h5 className="card-title" style={{ 
-                          fontWeight: '700', 
-                          color: '#292f36',
-                          fontSize: '1.3rem',
-                          marginBottom: '0.8rem',
-                          textTransform: 'capitalize'
-                        }}>{item.name || 'Pizza sin nombre'}</h5>
-                        <p className="card-text" style={{ 
-                          color: '#6c757d',
-                          fontSize: '1rem',
-                          marginBottom: '1rem'
-                        }}>
-                          Precio unitario: 
-                          <span style={{ fontWeight: '600', color: '#ff6b6b' }}>
-                            ${(item.price || 0).toLocaleString()}
-                          </span>
-                        </p>
+                  {/* Contenido */}
+                  <div style={{
+                    flex: 1,
+                    padding: '1.5rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between'
+                  }}>
+                    <div>
+                      <h5 style={{
+                        fontWeight: 700,
+                        color: '#292f36',
+                        fontSize: '1.25rem',
+                        marginBottom: '0.5rem',
+                        textTransform: 'capitalize'
+                      }}>
+                        {item.name || 'Pizza sin nombre'}
+                      </h5>
+                      <div style={{
+                        color: '#6c757d',
+                        fontSize: '1rem',
+                        marginBottom: '0.7rem'
+                      }}>
+                        Precio unitario:{' '}
+                        <span style={{ fontWeight: 600, color: '#ff6b6b' }}>
+                          ${(item.price || 0).toLocaleString()}
+                        </span>
                       </div>
-                      
-                      <div className="d-flex align-items-center justify-content-between">
-                        <div className="d-flex align-items-center" style={{ gap: '1rem' }}>
-                          <button 
-                            className="btn btn-sm"
-                            onClick={() => {
-                              console.log('Decrement clicked for:', item.id);
-                              decrementQuantity(item.id);
-                            }}
-                            style={{
-                              background: 'linear-gradient(135deg, #dc3545, #c82333)',
-                              border: 'none',
-                              color: 'white',
-                              width: '35px',
-                              height: '35px',
-                              borderRadius: '50%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontWeight: 'bold',
-                              boxShadow: '0 2px 8px rgba(220, 53, 69, 0.3)'
-                            }}
-                          >
-                            -
-                          </button>
-                          <span style={{ 
-                            fontWeight: '700', 
-                            fontSize: '1.1rem',
-                            color: '#292f36',
-                            minWidth: '80px',
-                            textAlign: 'center'
-                          }}>
-                            Cant: {item.quantity || 1}
-                          </span>
-                          <button 
-                            className="btn btn-sm"
-                            onClick={() => {
-                              console.log('Increment clicked for:', item.id);
-                              incrementQuantity(item.id);
-                            }}
-                            style={{
-                              background: 'linear-gradient(135deg, #28a745, #20c997)',
-                              border: 'none',
-                              color: 'white',
-                              width: '35px',
-                              height: '35px',
-                              borderRadius: '50%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontWeight: 'bold',
-                              boxShadow: '0 2px 8px rgba(40, 167, 69, 0.3)'
-                            }}
-                          >
-                            +
-                          </button>
-                        </div>
-                        
-                        <div className="d-flex align-items-center" style={{ gap: '1rem' }}>
-                          <div className="text-end">
-                            <p className="mb-0" style={{ 
-                              fontWeight: '700',
-                              fontSize: '1.2rem',
-                              color: '#ff6b6b'
-                            }}>
-                              ${((item.price || 0) * (item.quantity || 1)).toLocaleString()}
-                            </p>
-                          </div>
-                          <button 
-                            className="btn btn-sm"
-                            onClick={() => {
-                              console.log('Remove clicked for:', item.id);
-                              removeFromCart(item.id);
-                            }}
-                            style={{
-                              background: 'linear-gradient(135deg, #ff6b6b, #ff9f1c)',
-                              border: 'none',
-                              color: 'white',
-                              padding: '8px 15px',
-                              borderRadius: '20px',
-                              fontWeight: '600',
-                              fontSize: '0.85rem',
-                              boxShadow: '0 3px 10px rgba(255, 107, 107, 0.3)'
-                            }}
-                          >
-                            🗑️ Eliminar
-                          </button>
-                        </div>
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}>
+                      {/* Controles de cantidad */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+                        <button
+                          className="btn btn-sm"
+                          onClick={() => decrementQuantity(item.id)}
+                          style={{
+                            background: '#f44336',
+                            border: 'none',
+                            color: 'white',
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '50%',
+                            fontWeight: 'bold',
+                            fontSize: '1.2rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >-</button>
+                        <span style={{
+                          fontWeight: 700,
+                          fontSize: '1.1rem',
+                          color: '#292f36',
+                          minWidth: '40px',
+                          textAlign: 'center'
+                        }}>
+                          {item.quantity || 1}
+                        </span>
+                        <button
+                          className="btn btn-sm"
+                          onClick={() => incrementQuantity(item.id)}
+                          style={{
+                            background: '#43a047',
+                            border: 'none',
+                            color: 'white',
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '50%',
+                            fontWeight: 'bold',
+                            fontSize: '1.2rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >+</button>
+                      </div>
+                      {/* Precio total y eliminar */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+                        <span style={{
+                          fontWeight: 700,
+                          fontSize: '1.15rem',
+                          color: '#ff6b6b'
+                        }}>
+                          ${((item.price || 0) * (item.quantity || 1)).toLocaleString()}
+                        </span>
+                        <button
+                          className="btn btn-sm"
+                          onClick={() => removeFromCart(item.id)}
+                          style={{
+                            background: '#ff9f1c',
+                            border: 'none',
+                            color: 'white',
+                            padding: '7px 13px',
+                            borderRadius: '16px',
+                            fontWeight: 600,
+                            fontSize: '0.9rem'
+                          }}
+                        >🗑️</button>
                       </div>
                     </div>
                   </div>

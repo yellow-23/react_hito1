@@ -88,48 +88,78 @@ const Pizza = () => {
           {successMessage}
         </div>
       )}
-      
-      <div className="row">
-        <div className="col-md-6">
-          <img 
-            src={pizza.img} 
-            alt={pizza.name}
-            className="img-fluid rounded"
-            style={{ width: '100%', height: '400px', objectFit: 'cover' }}
-          />
-        </div>
-        <div className="col-md-6">
-          <h1 className="mb-3">{pizza.name}</h1>
-          <p className="text-muted mb-3">{pizza.desc}</p>
-          
-          <div className="mb-3">
-            <h4>Ingredientes:</h4>
-            <ul className="list-unstyled">
-              {pizza.ingredients && pizza.ingredients.map((ingredient, index) => (
-                <li key={index} className="mb-1">
-                  🍕 {ingredient}
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          <div className="d-flex justify-content-between align-items-center">
-            <h3 className="text-success mb-0">
-              Precio: ${pizza.price?.toLocaleString()}
-            </h3>
-            <button 
-              className="btn btn-danger"
-              onClick={handleAddToCart}
-              style={{
-                background: 'linear-gradient(135deg, #ff6b6b, #ff9f1c)',
-                border: 'none',
-                padding: '10px 20px',
-                borderRadius: '25px',
-                fontWeight: '600'
-              }}
-            >
-              Añadir al carrito 🛒
-            </button>
+      <div className="row justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
+        <div className="col-lg-5 mb-4">
+          <div style={{
+            background: '#fff',
+            borderRadius: '20px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.10)',
+            padding: '1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}>
+            <img 
+              src={pizza.img} 
+              alt={pizza.name}
+              className="img-fluid rounded"
+              style={{ width: '100%', maxWidth: '400px', height: '320px', objectFit: 'cover', marginBottom: '1.5rem', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}
+            />
+            <h2 style={{ fontWeight: 800, color: '#ff6b6b', marginBottom: '0.5rem', textAlign: 'center', textTransform: 'capitalize' }}>{pizza.name}</h2>
+            <p style={{ color: '#555', fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center', background: '#fffbe6', borderRadius: '8px', padding: '0.7rem 1rem' }}>
+              {pizza.desc}
+            </p>
+            <div style={{ marginBottom: '1.5rem', width: '100%' }}>
+              <h4 style={{ fontWeight: 700, color: '#292f36', marginBottom: '0.7rem' }}>Ingredientes</h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {pizza.ingredients && pizza.ingredients.map((ingredient, index) => {
+                  const capitalized = ingredient.charAt(0).toUpperCase() + ingredient.slice(1);
+                  return (
+                    <li key={index} style={{ marginBottom: '0.5rem', fontSize: '1.05rem', display: 'flex', alignItems: 'center' }}>
+                      <span style={{ fontSize: '1.2rem', marginRight: '0.5rem' }}>🍕</span> {capitalized}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              width: '100%',
+              gap: '1rem',
+              marginBottom: '0.5rem'
+            }}>
+              <span style={{
+                fontWeight: 800,
+                fontSize: '1.5rem',
+                color: '#ff6b6b',
+                background: 'none',
+                textAlign: 'center',
+                marginBottom: '0.2rem',
+                letterSpacing: '0.5px'
+              }}>
+                ${pizza.price?.toLocaleString()}
+              </span>
+              <button
+                className="btn"
+                onClick={handleAddToCart}
+                style={{
+                  background: 'linear-gradient(135deg, #ff6b6b)',
+                  border: 'none',
+                  padding: '12px 28px',
+                  borderRadius: '25px',
+                  fontWeight: '700',
+                  color: 'white',
+                  fontSize: '1.1rem',
+                  boxShadow: '0 4px 16px rgba(255,107,107,0.10)',
+                  transition: 'all 0.2s',
+                  margin: 0
+                }}
+              >
+                Añadir al carrito 🛒
+              </button>
+            </div>
           </div>
         </div>
       </div>

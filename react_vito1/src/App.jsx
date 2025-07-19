@@ -15,7 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function AppContent() {
   const [successMessage, setSuccessMessage] = useState("");
   const { token, setToken } = useUser();
-  const isLoggedIn = !!token;
+  const isLoggedIn = !!token && token !== 'false';
 
   // Clear success message after 3 seconds
   useEffect(() => {
@@ -165,9 +165,10 @@ function AppContent() {
         <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
       <Footer />
+
     </>
   );
-//
+}
 
 function App() {
   return (
@@ -175,7 +176,6 @@ function App() {
       <AppContent />
     </UserProvider>
   );
-}
 }
 
 export default App;
