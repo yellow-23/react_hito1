@@ -1,12 +1,73 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useUser } from '../context/UserContext';
 
 const Cart = () => {
-  const { cart, total, incrementQuantity, decrementQuantity, removeFromCart } = useCart();
+  const { cart, total, incrementQuantity, decrementQuantity, removeFromCart, clearCart } = useCart();
   const { token } = useUser();
+  const [loading, setLoading] = useState(false);
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
 
   console.log('Cart data:', cart); // Debug log
+
+  // Función para enviar el carrito al backend
+  const handleCheckout = async () => {
+    if (!token) return;
+    
+    setLoading(true);
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/checkouts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          cart: cart,
+        }),
+      });
+
+      if (response.ok) {
+        setPurchaseSuccess(true);
+        // Limpiar carrito después de compra exitosa
+        clearCart();
+      } else {
+        console.error('Error en el checkout');
+      }
+    } catch (error) {
+      console.error('Error de conexión:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mostrar mensaje de éxito
+  if (purchaseSuccess) {
+    return (
+      <div className="container my-5" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="text-center">
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
+          <h2 style={{ color: '#28a745', marginBottom: '1rem' }}>¡Compra realizada con éxito!</h2>
+          <p style={{ color: '#6c757d', fontSize: '1.1rem' }}>Gracias por tu compra. Tu pedido está siendo preparado.</p>
+          <button 
+            className="btn mt-3"
+            onClick={() => setPurchaseSuccess(false)}
+            style={{
+              background: 'linear-gradient(135deg, #ff6b6b, #ff9f1c)',
+              border: 'none',
+              color: 'white',
+              padding: '10px 20px',
+              borderRadius: '25px',
+              fontWeight: '600'
+            }}
+          >
+            Continuar comprando
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (cart.length === 0) {
     return (
@@ -221,12 +282,13 @@ const Cart = () => {
                   ${(total || 0).toLocaleString()}
                 </strong>
               </div>
-              {/* Botón de pagar deshabilitado si no hay token */}
+              {/* Botón de pagar */}
               <button
                 className="btn w-100"
-                disabled={!token}
+                disabled={!token || loading}
+                onClick={handleCheckout}
                 style={{
-                  background: 'linear-gradient(135deg, #28a745, #20c997)',
+                  background: !token || loading ? '#ccc' : 'linear-gradient(135deg, #28a745, #20c997)',
                   border: 'none',
                   color: 'white',
                   padding: '15px',
@@ -237,24 +299,35 @@ const Cart = () => {
                   letterSpacing: '0.5px',
                   boxShadow: '0 8px 20px rgba(40, 167, 69, 0.3)',
                   transition: 'all 0.3s ease',
-                  opacity: !token ? 0.5 : 1,
-                  cursor: !token ? 'not-allowed' : 'pointer'
+                  opacity: !token || loading ? 0.5 : 1,
+                  cursor: !token || loading ? 'not-allowed' : 'pointer'
                 }}
                 onMouseOver={(e) => {
-                  if (token) {
+                  if (token && !loading) {
                     e.target.style.transform = 'translateY(-2px)';
                     e.target.style.boxShadow = '0 12px 25px rgba(40, 167, 69, 0.4)';
                   }
                 }}
                 onMouseOut={(e) => {
-                  if (token) {
+                  if (token && !loading) {
                     e.target.style.transform = 'translateY(0)';
                     e.target.style.boxShadow = '0 8px 20px rgba(40, 167, 69, 0.3)';
                   }
                 }}
               >
-                💳 Proceder al pago
+                {loading ? '⏳ Procesando...' : '💳 Proceder al pago'}
               </button>
+              
+              {!token && (
+                <p style={{ 
+                  textAlign: 'center', 
+                  color: '#6c757d', 
+                  fontSize: '0.9rem', 
+                  marginTop: '10px' 
+                }}>
+                  Debes iniciar sesión para realizar la compra
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -1,10 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 
 const Profile = () => {
-  const { logout } = useUser();
-  // Por ahora usamos datos estáticos como indica el requerimiento
-  const userEmail = "usuario@ejemplo.com";
+  const { logout, email, getProfile } = useUser();
+  const [userEmail, setUserEmail] = useState(email);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Si tenemos email en el contexto, lo usamos
+    if (email) {
+      setUserEmail(email);
+    } else {
+      // Si no, intentamos obtener el perfil del backend
+      const fetchProfile = async () => {
+        setLoading(true);
+        const result = await getProfile();
+        if (result.success) {
+          setUserEmail(result.user.email);
+        }
+        setLoading(false);
+      };
+      fetchProfile();
+    }
+  }, [email, getProfile]);
+
+  if (loading) {
+    return (
+      <div className="container my-5" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div>Cargando...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container my-5" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
+import { useUser } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
 
-const LoginPage = ({ onLogin }) => {
+const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login } = useUser();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,10 +32,12 @@ const LoginPage = ({ onLogin }) => {
       return;
     }
 
-    // Call login function
-    const result = await onLogin(formData.email, formData.password);
+    // Call login function from UserContext
+    const result = await login(formData.email, formData.password);
     
-    if (!result.success) {
+    if (result.success) {
+      navigate('/'); // Redirect to home on successful login
+    } else {
       setError(result.error);
     }
     

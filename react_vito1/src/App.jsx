@@ -14,7 +14,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function AppContent() {
   const [successMessage, setSuccessMessage] = useState("");
-  const { token, setToken } = useUser();
+  const { token } = useUser();
   const isLoggedIn = !!token && token !== 'false';
 
   // Clear success message after 3 seconds
@@ -27,55 +27,6 @@ function AppContent() {
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
-
-  const handleLogin = async (email, password) => {
-    try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        setToken(data.token);
-        setSuccessMessage("¡Sesión iniciada correctamente!");
-        return { success: true };
-      } else {
-        return { success: false, error: data.error || 'Error al iniciar sesión' };
-      }
-    } catch {
-      return { success: false, error: 'Error de conexión' };
-    }
-  };
-
-
-  const handleRegister = async (email, password) => {
-    try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccessMessage("¡Usuario registrado correctamente! Ahora puedes iniciar sesión.");
-        return { success: true };
-      } else {
-        return { success: false, error: data.error || 'Error al registrar usuario' };
-      }
-    } catch {
-      return { success: false, error: 'Error de conexión' };
-    }
-  };
 
   return (
     <>
@@ -119,7 +70,7 @@ function AppContent() {
             isLoggedIn ? (
               <Navigate to="/" replace />
             ) : (
-              <LoginPage onLogin={handleLogin} />
+              <LoginPage />
             )
           } 
         />
@@ -129,7 +80,7 @@ function AppContent() {
             isLoggedIn ? (
               <Navigate to="/" replace />
             ) : (
-              <RegisterPage onRegister={handleRegister} />
+              <RegisterPage />
             )
           } 
         />

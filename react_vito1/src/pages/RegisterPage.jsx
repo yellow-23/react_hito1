@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useUser } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
 
-const RegisterPage = ({ onRegister }) => {
+const RegisterPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -8,6 +10,8 @@ const RegisterPage = ({ onRegister }) => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { register } = useUser();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,9 +56,12 @@ const RegisterPage = ({ onRegister }) => {
 
     setLoading(true);
     
-    const result = await onRegister(formData.email, formData.password);
+    // Call register function from UserContext
+    const result = await register(formData.email, formData.password);
     
-    if (!result.success) {
+    if (result.success) {
+      navigate('/'); // Redirect to home on successful registration
+    } else {
       setError(result.error);
     }
     
@@ -128,7 +135,8 @@ const RegisterPage = ({ onRegister }) => {
                 fontSize: "1rem",
                 transition: "border-color 0.3s ease",
                 outline: "none",
-                backgroundColor: "#f8f9fa"
+                backgroundColor: "#f8f9fa",
+                color: "#222"
               }}
             />
           </div>
@@ -157,7 +165,8 @@ const RegisterPage = ({ onRegister }) => {
                 fontSize: "1rem",
                 transition: "border-color 0.3s ease",
                 outline: "none",
-                backgroundColor: "#f8f9fa"
+                backgroundColor: "#f8f9fa",
+                color: "#222"
               }}
             />
           </div>
@@ -186,7 +195,8 @@ const RegisterPage = ({ onRegister }) => {
                 fontSize: "1rem",
                 transition: "border-color 0.3s ease",
                 outline: "none",
-                backgroundColor: "#f8f9fa"
+                backgroundColor: "#f8f9fa",
+                color: "#222"
               }}
             />
           </div>
